@@ -10,7 +10,7 @@ img1 = frame
 r = cv2.selectROI(img1)
 imCrop = img1[int(r[1]):int(r[1]+r[3]), int(r[0]):int(r[0]+r[2])]
 kp1,des1 = detector.detectAndCompute(imCrop,None)
-MIN_MATCH_COUNT = 2
+MIN_MATCH_COUNT = 1
 while 1:
 	ret,frame = cap.read()
 	img2 = frame
@@ -24,13 +24,13 @@ while 1:
 		# store all the good matches as per Lowe's ratio test.
 		good = []
 		for m,n in matches:
-		    if m.distance < 0.7*n.distance:
+		    if m.distance < 0.8*n.distance:
 		        good.append(m)
 		if len(good)>MIN_MATCH_COUNT:
 		    src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
 		    dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
 
-		    M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
+		    M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,10.0)
 		    matchesMask = mask.ravel().tolist()
 		    h,w,c = imCrop.shape
 		    pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
